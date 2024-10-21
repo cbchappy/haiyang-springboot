@@ -2,7 +2,7 @@ package com.example.haiyang.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.haiyang.entity.Test;
-import com.example.haiyang.mapper.TestMapper;
+import com.example.haiyang.dao.TestMapper;
 import com.example.haiyang.service.ITestService;
 import org.springframework.stereotype.Service;
 

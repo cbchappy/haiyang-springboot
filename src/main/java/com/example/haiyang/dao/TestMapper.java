@@ -1,4 +1,4 @@
-package com.example.haiyang.mapper;
+package com.example.haiyang.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.example.haiyang.entity.Test;

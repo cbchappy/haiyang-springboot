@@ -5,7 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@MapperScan("com.example.haiyang.mapper")
+@MapperScan("com.example.haiyang.dao")
 public class HaiyangApplication {
 
     public static void main(String[] args) {
