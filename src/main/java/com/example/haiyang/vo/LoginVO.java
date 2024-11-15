@@ -12,6 +12,8 @@ import lombok.Data;
 public class LoginVO {
     private String wxToken;
 
+    private String userId;
+
     private String number;
 
     private String avatar;

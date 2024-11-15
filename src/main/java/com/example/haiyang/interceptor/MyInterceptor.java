@@ -1,12 +1,10 @@
 package com.example.haiyang.interceptor;
 
-import cn.hutool.Hutool;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
-import com.example.haiyang.util.CommonProperties;
+import com.example.haiyang.constants.RequestConstants;
 import com.example.haiyang.util.MyThreadLocal;
 import com.example.haiyang.util.R;
-import com.example.haiyang.util.RedisName;
+import com.example.haiyang.constants.RedisConstants;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -37,18 +35,20 @@ public class MyInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         log.info("{}进入了拦截器!", request.getRequestURI());
-        String token = request.getHeader(CommonProperties.TOKEN_NAME);
-        token = token == null ? "" : token;
-        String id = template.opsForValue().getAndExpire(RedisName.LOGIN_EXPIRE + token, 30, TimeUnit.MINUTES);
+        String token = request.getHeader(RequestConstants.HEADER_TOKEN);
+        String userId = request.getHeader(RequestConstants.HEADER_USERID);
+         userId = userId == null ? "" : userId;
+        String reToken = template.opsForValue().getAndExpire(RedisConstants.LOGIN + userId, 30, TimeUnit.MINUTES);
 
-        if (StrUtil.isBlankIfStr(id)) {
+        if (reToken == null || !reToken.equals(token)) {
             log.info("拒绝访问");
             response.setCharacterEncoding("utf-8");
             response.getWriter().write(JSONUtil.toJsonStr(R.fail("没有权限", null)));
             response.setContentType("application/json");
             return false;
         }
-        MyThreadLocal.setUserId(Integer.valueOf(id));
+        MyThreadLocal.setUserId(Integer.valueOf(userId));
+        MyThreadLocal.setToken(reToken);
 
         return true;
     }

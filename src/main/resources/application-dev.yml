@@ -2,7 +2,7 @@
 spring:
   #数据库配置
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/haiyang?useUnicode=true&characterEncoding=utf-8
+    url: jdbc:mysql://8.136.101.132:3306/haiyang?useUnicode=true&characterEncoding=utf-8
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -11,10 +11,14 @@ spring:
     redis:
       database: 0
       port: 6379
-      host: 192.168.200.128
+      host: 8.136.101.132
+      password: 123456
   servlet:
     multipart:
       max-file-size: 5MB #上传文件大小
+  # 配置spring时区
+  jackson:
+    time-zone: GMT+8
 
 #端口
 server:
@@ -24,3 +28,7 @@ server:
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
+
+
+
+

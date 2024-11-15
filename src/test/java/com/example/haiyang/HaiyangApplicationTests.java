@@ -1,6 +1,6 @@
 package com.example.haiyang;
 
-import com.example.haiyang.util.RedisName;
+import com.example.haiyang.constants.RedisConstants;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,7 +15,7 @@ class HaiyangApplicationTests {
 
     @Test
     void contextLoads() {
-        redisTemplate.opsForValue().set(RedisName.CODE + "123", "123", 60, TimeUnit.SECONDS);
+
     }
 
 }

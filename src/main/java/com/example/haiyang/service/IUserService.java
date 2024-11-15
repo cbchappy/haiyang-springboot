@@ -23,4 +23,6 @@ public interface IUserService extends IService<User> {
     R signIn(SignInDTO signInDTO);
 
     R updateUser(User user);
+
+    R logout();
 }

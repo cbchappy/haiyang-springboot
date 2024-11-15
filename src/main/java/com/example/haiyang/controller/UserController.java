@@ -4,6 +4,7 @@ import com.example.haiyang.dto.LoginDTO;
 import com.example.haiyang.dto.SignInDTO;
 import com.example.haiyang.entity.User;
 import com.example.haiyang.service.IUserService;
+import com.example.haiyang.util.MyThreadLocal;
 import com.example.haiyang.util.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,12 @@ public class UserController {
     public R update(@RequestBody User user){
         log.info("更新用户");
         return service.updateUser(user);
+    }
+
+    @PostMapping("/logout")
+    public R logout(){
+        log.info("用户{}退出登录", MyThreadLocal.getUserId());
+        return service.logout();
     }
 
 }
