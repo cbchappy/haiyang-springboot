@@ -11,6 +11,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -21,10 +23,11 @@ import java.util.concurrent.BlockingQueue;
 public class BMTest {
 
     public static void main(String[] args) throws InterruptedException {
-        LocalDateTime now = LocalDateTime.now();
+        Map<String, Log> map = new HashMap<>();
         Log log = new Log();
-        log.setCreateTime(now);
-        String jsonStr = JSONUtil.toJsonStr(log);
-        System.out.println(jsonStr);
+        log.setUserId(1);
+
+        map.put("1", log);
+        System.out.println(JSONUtil.toJsonStr(map));
     }
 }

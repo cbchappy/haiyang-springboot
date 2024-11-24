@@ -6,6 +6,7 @@ spring:
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
+     #PKCS12
   #redis
   data:
     redis:
@@ -19,16 +20,29 @@ spring:
   # 配置spring时区
   jackson:
     time-zone: GMT+8
+  kafka: #kafka
+    bootstrap-servers: 8.136.101.132:9092
+    producer:
+      retries: 10
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: operate_log
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
 #端口
-server:
-  port: 8080
+#server:
+#  port: 8080
+#  ssl:
+#    key-store-type: PKCS12
+#    key-store-password: r4novnnw
+#    key-store: classpath:hhumarinegeology.top.pfx
 
 #驼峰命名
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
-
 
 
 

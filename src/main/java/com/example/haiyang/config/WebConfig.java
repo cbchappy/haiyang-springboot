@@ -16,7 +16,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new MyInterceptor()).excludePathPatterns("/user/login", "/user/signIn", "/test/test/*");
+        registry.addInterceptor(new MyInterceptor()).excludePathPatterns("/user/login", "/user/signIn", "/test/**");
         WebMvcConfigurer.super.addInterceptors(registry);
     }
 

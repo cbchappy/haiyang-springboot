@@ -16,7 +16,7 @@ import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
-
+//鉴权 连接 (发送 监听)
 public class BigModelNew extends WebSocketListener {
     // 地址与鉴权信息  https://spark-api.xf-yun.com/v1.1/chat   1.5地址  domain参数为general
     // 地址与鉴权信息  https://spark-api.xf-yun.com/v2.1/chat   2.0地址  domain参数为generalv2
@@ -60,7 +60,7 @@ public class BigModelNew extends WebSocketListener {
 
 
 
-    public static boolean canAddHistory(List<RoleContent> historyList) {// 由于历史记录最大上线1.2W左右，需要判断是能能加入历史
+    public static boolean canAddHistory(List<RoleContent> historyList) {// 由于历史记录最大上限1.2W左右，需要判断是能能加入历史
 
         int history_length = 0;
         for (RoleContent temp : historyList) {

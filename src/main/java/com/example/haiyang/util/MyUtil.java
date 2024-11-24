@@ -30,10 +30,12 @@ import static com.example.haiyang.util.BigModelNew.*;
 public class MyUtil {
 
     private static final MD5 md5 = new MD5();
+    //md5加密
     public static String digest(String str){
         return md5.digestHex16(str);
     }
 
+    //上传文件到腾讯云对象存储
     public static String uploadFile(MultipartFile file, String key){
 
         String secretId = "AKIDzpUyEJFyYxDH6ix1rUJvJSM1VowTpwrX";
@@ -70,6 +72,7 @@ public class MyUtil {
         return url.toString();
     }
 
+    //发送消息给大模型并获取消息队列
     public static BlockingQueue<String> sendToBigModel(String question, String userId){
 
         BlockingQueue<String> queue = new LinkedBlockingQueue<>();
@@ -107,4 +110,45 @@ public class MyUtil {
 
         }
     }
+
+    public static String getThrowableContent(Throwable e){
+        StringBuilder builder = new StringBuilder();
+        builder.append(e);
+        builder.append("\n");
+
+        StackTraceElement[] stackTrace = e.getStackTrace();
+        for (StackTraceElement ele : stackTrace) {
+            builder.append("\tat ").append(ele);
+            builder.append("\n");
+        }
+
+        Throwable cause = e.getCause();
+        return getThrowableCause(builder, cause, stackTrace);
+    }
+
+    private static String getThrowableCause(StringBuilder builder, Throwable cause, StackTraceElement[] encloseTrace){
+        if(cause == null){
+            return builder.toString();
+        }
+        builder.append("Cause By: ");
+        builder.append(cause).append("\n");
+        StackTraceElement[] stackTrace = cause.getStackTrace();
+        int n = stackTrace.length - 1;
+        int m = encloseTrace.length - 1;
+        while (n >= 0 && m >= 0 && stackTrace[n].equals(encloseTrace[m])){
+            n--;
+            m--;
+        }
+        for (int i = 0; i <= n; i++) {
+            builder.append("\tat ").append(stackTrace[i]);
+            builder.append("\n");
+        }
+        int r = stackTrace.length - 1 - n;
+        if(r > 0){
+           builder.append("\t... ").append(r).append(" more").append("\n");
+        }
+
+        return getThrowableCause(builder, cause.getCause(), stackTrace);
+    }
+
 }
