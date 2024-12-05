@@ -72,45 +72,10 @@ public class MyUtil {
         return url.toString();
     }
 
-    //发送消息给大模型并获取消息队列
-    public static BlockingQueue<String> sendToBigModel(String question, String userId){
 
-        BlockingQueue<String> queue = new LinkedBlockingQueue<>();
-        new MyStartBMThread(queue, question, userId).start();
-        return queue;
-    }
 
-    private static class MyStartBMThread extends Thread{
-        private final BlockingQueue<String> queue;
-        private final String question;
-        private final String userId;
-        public MyStartBMThread(BlockingQueue<String> queue, String question, String userId){
-            this.queue = queue;
-            this.question = question;
-            this.userId = userId;
-        }
-        @Override
-        public void run() {
 
-            // 构建鉴权url
-            String authUrl = null;
-            try {
-                authUrl = getAuthUrl(hostUrl, apiKey, apiSecret);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-            OkHttpClient client = new OkHttpClient.Builder().build();//会开一个新线程，记得关闭
-            String url = authUrl.replace("http://", "ws://").replace("https://", "wss://");
-            Request request = new Request.Builder().url(url).build();
-            totalAnswer = "";
-            WebSocket webSocket = client.newWebSocket(request, new BigModelNew(userId,
-                    false, queue, question));
-
-            client.dispatcher().executorService().shutdown();
-
-        }
-    }
-
+    //获取exception的具体内容
     public static String getThrowableContent(Throwable e){
         StringBuilder builder = new StringBuilder();
         builder.append(e);

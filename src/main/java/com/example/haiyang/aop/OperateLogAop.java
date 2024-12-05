@@ -65,7 +65,7 @@ public class OperateLogAop{
         long end = System.currentTimeMillis();
         operateLog.setConsumingTime(end - start);//花费的时间
         operateLog.setRes(JSONUtil.toJsonStr(res));
-        //todo  将日志插入数据库 考虑结合异步 kafka或rabbitmq  mysql和redis数据卷挂载
+        //todo  将日志插入数据库 考虑结合异步 kafka或rabbitmq
         kafkaTemplate.send(KafkaConstants.OPERATE_LOG_TOPIC, JSONUtil.toJsonStr(operateLog));
         return res;
     }

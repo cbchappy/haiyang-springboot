@@ -1,7 +1,6 @@
 package com.example.haiyang.util;
 
-import cn.hutool.json.JSONUtil;
-import com.example.haiyang.dto.WebSocketDto;
+import com.example.haiyang.config.MyServerEndpointConfigurator;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -10,9 +9,9 @@ import jakarta.websocket.server.PathParam;
 import jakarta.websocket.server.ServerEndpoint;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestBody;
 
-import java.io.IOException;
+
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -21,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @DateTime 2024/10/24 15:25
  * @Description
  */
-@ServerEndpoint(value = "/chat/{userId}")
+@ServerEndpoint(value = "/chat", configurator = MyServerEndpointConfigurator.class)
 @Component
 @Slf4j
 public class MyWebSocket {
@@ -29,15 +28,15 @@ public class MyWebSocket {
     /**
      * 存放所有在线的客户端
      */
-    private static final ConcurrentHashMap<String, MyWebSocket> webSocketMap = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Integer, MyWebSocket> webSocketMap = new ConcurrentHashMap<>();
     /**
      * 连接uid和连接会话
      */
-    private String userId;
+    private Integer userId;
     private Session session;
 
     //新增一个方法用于主动向客户端发送消息
-    public static void sendMessage(String userId,  BlockingQueue<String> queue,JsonObject jsonObject){
+    public static void sendMessage(Integer userId,  BlockingQueue<String> queue,JsonObject jsonObject){
 
         MyWebSocket webSocket = webSocketMap.get(userId);
         if (webSocket != null) {
@@ -45,6 +44,7 @@ public class MyWebSocket {
                     try {
                         String v = queue.take();
                         if(v.equals("")){
+                            BigModel.closeBigModel(userId);
                             break;
                         }
                         jsonObject.addProperty("text", v);
@@ -61,8 +61,9 @@ public class MyWebSocket {
 
 
     @OnOpen
-    public void onOpen(Session session, @PathParam("userId") String userId) {
-        this.userId = userId;
+    public void onOpen(Session session) {
+        log.info("进入opOpen的线程名字为:{}", Thread.currentThread().getName());
+        this.userId = MyThreadLocal.getUserId();
         this.session = session;
         webSocketMap.put(userId, this);
         System.out.println("【websocket消息】有新的连接,连接id=" + userId + ":" + this);
@@ -70,8 +71,9 @@ public class MyWebSocket {
 
     //前端关闭时一个websocket时
     @OnClose
-    public void onClose(@PathParam("userId") String userId) {
+    public void onClose() {
         webSocketMap.remove(userId);
+        BigModel.closeBigModel(userId);//关闭以移除历史对话
         System.out.println("【websocket消息】连接断开:" + userId);
     }
 
@@ -92,9 +94,9 @@ public class MyWebSocket {
         JsonObject jsonObject = jsonElement.getAsJsonObject();
         String msg = jsonObject.get("text").getAsString();
         log.info("msg:{}", msg);
-       //todo 待测试
 
-        BlockingQueue<String> queue = MyUtil.sendToBigModel(msg, userId);
+
+        BlockingQueue<String> queue = BigModel.sendToBigModel(msg, userId);
         sendMessage(userId, queue, jsonObject);
     }
 }

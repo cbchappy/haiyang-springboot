@@ -8,14 +8,14 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.util.concurrent.TimeUnit;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class HaiyangApplicationTests {
     @Autowired
     StringRedisTemplate redisTemplate;
 
     @Test
     void contextLoads() {
-
+        redisTemplate.opsForValue().set(RedisConstants.LOGIN + "1", "a");
     }
 
 }
