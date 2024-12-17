@@ -48,10 +48,10 @@ public class OperateLogAop{
 
     }
 
-    //todo 优化日志
+
     @Around(value = "operExceptionLogPoinCut()")
     public Object recordLog(ProceedingJoinPoint joinPoint) throws Throwable {
-        log.info("被代理了");
+        log.debug("aop代理, 记录操作日志");
         OperateLog operateLog = new OperateLog();
         operateLog.setUserId(MyThreadLocal.getUserId());
         operateLog.setOperateTime(LocalDateTime.now());
@@ -65,7 +65,6 @@ public class OperateLogAop{
         long end = System.currentTimeMillis();
         operateLog.setConsumingTime(end - start);//花费的时间
         operateLog.setRes(JSONUtil.toJsonStr(res));
-        //todo  将日志插入数据库 考虑结合异步 kafka或rabbitmq
         kafkaTemplate.send(KafkaConstants.OPERATE_LOG_TOPIC, JSONUtil.toJsonStr(operateLog));
         return res;
     }
@@ -76,7 +75,7 @@ public class OperateLogAop{
     //todo 方法名顺序要正常
     public void ExceptionRecord(JoinPoint joinPoint, Throwable e){
 
-        log.error("--------------------ExceptionRecord代理");
+        log.debug("记录操作异常日志");
 
         ExceptionLog exceptionLog = new ExceptionLog();
         exceptionLog.setUserId(MyThreadLocal.getUserId());//用户id

@@ -41,14 +41,14 @@ public class MyServerEndpointConfigurator extends ServerEndpointConfig.Configura
 
     @Override
     public void modifyHandshake(ServerEndpointConfig sec, HandshakeRequest request, HandshakeResponse response) {
-        log.error("------------校验--------------");
+
 
         Map<String, List<String>> headers = request.getHeaders();
         String token = headers.get(RequestConstants.HEADER_TOKEN).get(0);
         String userId = headers.get(RequestConstants.HEADER_USERID).get(0);
 
-        log.info("{}进入了websocket拦截器!", request.getRequestURI());
-        log.info("进入websocket拦截器的线程名字为:{}", Thread.currentThread().getName());
+        log.debug("{}进入了websocket拦截器!", request.getRequestURI());
+
 
         userId = userId == null ? "" : userId;
         String reToken = template.opsForValue().getAndExpire(RedisConstants.LOGIN + userId, 30, TimeUnit.MINUTES);

@@ -5,7 +5,7 @@ import lombok.Data;
 /**
  * @Author Cbc
  * @DateTime 2024/10/13 14:04
- * @Description
+ * @Description 结果类
  */
 @Data
 public class R {
@@ -35,6 +35,14 @@ public class R {
 
     public static R fail( Object data){
         return new R(0, "请求失败", data);
+    }
+
+    public static R fail(){
+        return new R(0, "请求失败", null);
+    }
+
+    public static R success(){
+        return new R(1, "请求成功", null);
     }
 
 

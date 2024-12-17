@@ -44,6 +44,10 @@ public class MyExceptionHandler {
     }
 
 
+    /**
+     * 拦截所有异常
+     * @param exception
+     */
     @ExceptionHandler(value = Exception.class)
     public R allException(Exception exception){
         String msg = exception.getMessage();

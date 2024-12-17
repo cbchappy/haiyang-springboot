@@ -44,5 +44,9 @@ mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
 
+#设置日志等级
+logging:
+  level:
+    org.apache.kafka.clients.producer: warn
 
 

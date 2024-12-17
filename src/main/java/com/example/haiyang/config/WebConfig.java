@@ -10,7 +10,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 /**
  * @Author Cbc
  * @DateTime 2024/10/16 21:13
- * @Description
+ * @Description mvc拦截器 拦截controller的请求
  */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {

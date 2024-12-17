@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @Author Cbc
  * @DateTime 2024/10/16 21:08
- * @Description
+ * @Description 自定义拦截器 进行权限校验 并存储一些信息到ThreadLocal
  */
 @Slf4j
 @Component
@@ -34,14 +34,14 @@ public class MyInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        log.info("{}进入了拦截器!", request.getRequestURI());
+        log.info("请求{}进入了拦截器!", request.getRequestURI());
         String token = request.getHeader(RequestConstants.HEADER_TOKEN);
         String userId = request.getHeader(RequestConstants.HEADER_USERID);
          userId = userId == null ? "" : userId;
         String reToken = template.opsForValue().getAndExpire(RedisConstants.LOGIN + userId, 30, TimeUnit.MINUTES);
 
         if (reToken == null || !reToken.equals(token)) {
-            log.info("拒绝访问");
+            log.info("权限校验不通过, 拒绝访问");
             response.setCharacterEncoding("utf-8");
             response.getWriter().write(JSONUtil.toJsonStr(R.fail("没有权限", null)));
             response.setContentType("application/json");

@@ -20,13 +20,12 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 
-import static com.example.haiyang.util.BigModelNew.*;
-
 /**
  * @Author Cbc
  * @DateTime 2024/10/16 22:22
  * @Description
  */
+//org.apache.kafka.clients.producer
 public class MyUtil {
 
     private static final MD5 md5 = new MD5();
