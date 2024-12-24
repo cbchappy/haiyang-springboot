@@ -36,11 +36,10 @@ import java.time.LocalDateTime;
 @Aspect
 @Component
 @Slf4j
-public class OperateLogAop{
+public class OperateLogAop {
 
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
-
 
 
     @Pointcut("execution(public * com.example.haiyang.controller.*.*(..))")
@@ -70,12 +69,11 @@ public class OperateLogAop{
     }
 
 
-
     @AfterThrowing(value = "operExceptionLogPoinCut()", throwing = "e", argNames = "joinPoint,e")//todo !!!!!!!!!
     //todo 方法名顺序要正常
-    public void ExceptionRecord(JoinPoint joinPoint, Throwable e){
+    public void ExceptionRecord(JoinPoint joinPoint, Throwable e) {
 
-        log.debug("记录操作异常日志");
+        log.debug("aop代理, 记录操作异常日志");
 
         ExceptionLog exceptionLog = new ExceptionLog();
         exceptionLog.setUserId(MyThreadLocal.getUserId());//用户id
@@ -93,7 +91,7 @@ public class OperateLogAop{
             reader = request.getReader();
             String line;
             StringBuilder content = new StringBuilder();
-            while ((line = reader.readLine()) != null){
+            while ((line = reader.readLine()) != null) {
                 content.append(line);
             }
             exceptionLog.setRequestBody(content.toString());//请求体--json模式 不包括文件
@@ -109,7 +107,6 @@ public class OperateLogAop{
         kafkaTemplate.send(KafkaConstants.EXCEPTION_LOG_TOPIC, JSONUtil.toJsonStr(exceptionLog));
 
     }
-
 
 
 }

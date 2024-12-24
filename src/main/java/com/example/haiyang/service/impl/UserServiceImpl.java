@@ -1,6 +1,7 @@
 package com.example.haiyang.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.MD5;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.haiyang.constants.CommonConstants;
@@ -22,6 +23,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
+import static com.example.haiyang.constants.CommonConstants.SALT;
+
 /**
  * <p>
  *  服务实现类
@@ -42,23 +45,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         wrapper.eq(User::getNumber, loginDTO.getNumber());
         User user = getOne(wrapper);
         if(user == null){
-            return R.fail("用户不存在", null);
+            return R.failMsg("用户不存在");
         }
         String id = String.valueOf(user.getId());
 
         if(template.opsForValue().get(RedisConstants.LOGIN + id) != null){
-            return R.fail("用户已在线", null);
+            return R.failMsg("用户已在线");
         }
 
         //进行md5加密
 
         String md5PW = MyUtil.digest(loginDTO.getPassword());
         if(!md5PW.equals(user.getPassword())){
-            return R.fail("输入密码错误", null);
+            return R.failMsg("输入密码错误");
         }
 
         //将信息存入redis 设置过期时间
-        String token = MyUtil.digest(user.getNumber() + LocalDateTime.now());
+        String token = MyUtil.digest(user.getNumber() + LocalDateTime.now() + SALT);
         template.opsForValue().set(RedisConstants.LOGIN + id, token, 30, TimeUnit.MINUTES);
 
         LoginVO loginVO = new LoginVO();
@@ -67,6 +70,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         loginVO.setNumber(user.getNumber());
         loginVO.setAvatar(user.getAvatar());
         loginVO.setNickname(user.getNickname());
+
         return R.success("登录成功", loginVO);
     }
 
@@ -74,11 +78,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public R signIn(SignInDTO signInDTO) {
+        if(StrUtil.isBlankIfStr(signInDTO.getNumber())){
+            return R.failMsg("输入账户名格式不合理!");
+        }
+        if(StrUtil.isBlankIfStr(signInDTO.getPassword())){
+            return R.failMsg("输入密码格式不合理!");
+        }
+
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(User::getNumber, signInDTO.getNumber());
         User user = getOne(wrapper);
         if(user != null){
-            return R.fail("该账号已注册", null);
+            return R.failMsg("该账号已注册");
         }
         User newUser = new User();
         newUser.setNumber(signInDTO.getNumber());
@@ -87,6 +98,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         newUser.setNickname("user_" + RandomUtil.randomString(5));
         newUser.setAvatar(CommonConstants.DEFAULT_AVATAR);
         save(newUser);
+
         return R.success(signInDTO);
     }
 
@@ -102,7 +114,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public R logout() {
         //从redis中移除key
         template.delete(RedisConstants.LOGIN + MyThreadLocal.getUserId());
-        //todo 修改状态 暂未在数据库中设置状态
-        return R.success(null);
+
+        return R.success();
     }
 }

@@ -47,19 +47,19 @@ public class MyServerEndpointConfigurator extends ServerEndpointConfig.Configura
         String token = headers.get(RequestConstants.HEADER_TOKEN).get(0);
         String userId = headers.get(RequestConstants.HEADER_USERID).get(0);
 
-        log.debug("{}进入了websocket拦截器!", request.getRequestURI());
+        log.info("{}进入了websocket拦截器!", request.getRequestURI());
 
 
         userId = userId == null ? "" : userId;
         String reToken = template.opsForValue().getAndExpire(RedisConstants.LOGIN + userId, 30, TimeUnit.MINUTES);
 
         if (reToken == null || !reToken.equals(token)) {
-            throw new RuntimeException("请求无法通过权限校验");
+            log.info("websocket权限校验不通过");
+            throw new RuntimeException("websocket请求无法通过权限校验");
 //            System.err.println("请求无法通过权限校验");
 //            return;
         }
         MyThreadLocal.setUserId(Integer.valueOf(userId));
-        MyThreadLocal.setToken(reToken);
 
         super.modifyHandshake(sec, request, response);
     }

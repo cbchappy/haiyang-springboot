@@ -40,12 +40,12 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements ILogS
         log.setCreateTime(LocalDateTime.now());
         //todo 点位等
         save(log);
-        return R.success("保存成功", null);
+        return R.successMsg("保存成功");
     }
 
     @Override
     public R getPage(LogPageDTO logPageDTO) {
-      //todo 待测
+
         Page<Log> page = new Page<>(logPageDTO.getPageNum(), logPageDTO.getPageSize());
 
         LambdaQueryWrapper<Log> wrapper = new LambdaQueryWrapper<>();
@@ -69,7 +69,7 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements ILogS
     @Override
     public R del(Integer id) {
         logMapper.deleteById(id);
-        return R.success("del成功", null);
+        return R.successMsg("del成功");
     }
 
     @Override

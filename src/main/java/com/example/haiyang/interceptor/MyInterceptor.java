@@ -43,13 +43,13 @@ public class MyInterceptor implements HandlerInterceptor {
         if (reToken == null || !reToken.equals(token)) {
             log.info("权限校验不通过, 拒绝访问");
             response.setCharacterEncoding("utf-8");
-            response.getWriter().write(JSONUtil.toJsonStr(R.fail("没有权限", null)));
+            response.getWriter().write(JSONUtil.toJsonStr(R.failMsg("没有权限")));
             response.setContentType("application/json");
             return false;
         }
         MyThreadLocal.setUserId(Integer.valueOf(userId));
-        MyThreadLocal.setToken(reToken);
 
+    //redis存储 key: ---userId   value: token
         return true;
     }
 

@@ -33,16 +33,17 @@ public class R {
         return new R(1, "请求成功", data);
     }
 
-    public static R fail( Object data){
-        return new R(0, "请求失败", data);
-    }
 
-    public static R fail(){
-        return new R(0, "请求失败", null);
+    public static R failMsg(String msg){
+        return new R(0, msg, null);
     }
 
     public static R success(){
         return new R(1, "请求成功", null);
+    }
+
+    public static R successMsg(String msg){
+        return new R(1, msg, null);
     }
 
 

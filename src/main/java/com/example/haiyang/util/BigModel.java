@@ -1,5 +1,6 @@
 package com.example.haiyang.util;
 
+import cn.hutool.extra.spring.SpringUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -7,6 +8,13 @@ import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.data.redis.core.ListOperations;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.WebApplicationContext;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -18,35 +26,35 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import static com.example.haiyang.constants.RedisConstants.AI_HISTORY;
+
 //netstat -tuln | grep 3306
+
 /**
  * @Author Cbc
  * @DateTime 2024/11/24 19:11
- * @Description 重新改写之前的BigModel
+ * @Description 重新改写之前的BigModel  //todo redis存储暂时的历史   todo 存储redis出现错误 无法将数据存入redis
  */
 @Slf4j
 public class BigModel {
 
-    // 地址与鉴权信息  https://spark-api.xf-yun.com/v1.1/chat   1.5地址  domain参数为general
-    // 地址与鉴权信息  https://spark-api.xf-yun.com/v2.1/chat   2.0地址  domain参数为generalv2
+
     private static final String hostUrl = "https://spark-api.xf-yun.com/v3.5/chat";//模型不同, 地址也不同(domain也是)
     private static final String appid = "9dd2b260";
     private static final String apiSecret = "MDZhYjZkMTEyMzU5OWExMjFkYThkNThj";
     private static final String apiKey = "96040cf3e92346e9dcf20531dd2425a6";
     private static final Gson gson = new Gson();
-    //todo close后也要删除historyList
-    //todo 关闭websocket
     //存储对话历史
-    private static final ConcurrentHashMap<Integer, List<RoleContent>> historyMap = new ConcurrentHashMap<>();
 
+    private static final StringRedisTemplate redisTemplate ;
+
+    //初始化redisTemplate
+    static {
+        redisTemplate = SpringUtil.getBean(StringRedisTemplate.class);
+    }
     //接受问题, 返回阻塞队列, 可从队列持续获取消息, 用""标识回答已经结束
-    public static BlockingQueue<String> sendToBigModel(String question, Integer userId){
+    public static BlockingQueue<String> sendToBigModel(String question, Integer userId) {
         BlockingQueue<String> queue = new LinkedBlockingQueue<>();
-
-        //生成historyList
-        if(!historyMap.containsKey(userId)){
-            historyMap.put(userId, new ArrayList<>());
-        }
 
         String authUrl;
         try {
@@ -57,15 +65,15 @@ public class BigModel {
         OkHttpClient client = new OkHttpClient.Builder().build();//会开一个新线程，记得关闭
         String url = authUrl.replace("http://", "ws://").replace("https://", "wss://");
         Request request = new Request.Builder().url(url).build();
-        WebSocket webSocket = client.newWebSocket(request, new AIWebSocketListener(question, historyMap.get(userId), queue));
+        client.newWebSocket(request, new AIWebSocketListener(question, queue, userId));
         client.dispatcher().executorService().shutdown();
 
         return queue;
     }
 
     //移除对话历史
-    public static void closeBigModel(Integer userId){
-        historyMap.remove(userId);
+    public static void closeBigModel(Integer userId) {
+        removeHistory(userId);
     }
 
     // 鉴权方法, 返回websocket的url
@@ -103,45 +111,24 @@ public class BigModel {
     }
 
 
-    //判断对话还能不能加入历史记录
-    private static boolean canAddHistory(List<RoleContent> historyList) {// 由于历史记录最大上限1.2W左右，需要判断是能能加入历史
-
-        int history_length = 0;
-        for (RoleContent temp : historyList) {
-            history_length = history_length + temp.content.length();
-        }
-        if (history_length > 12000) {
-            historyList.remove(0);
-            historyList.remove(1);
-            historyList.remove(2);
-            historyList.remove(3);
-            historyList.remove(4);
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-
-
     //自定义WebSocketListener, 一个问题对应一个实例
-    private static class AIWebSocketListener extends WebSocketListener{
+    private static class AIWebSocketListener extends WebSocketListener {
 
         private final String question;
-        private final List<RoleContent> historyList;
         private final StringBuilder totalAnswer = new StringBuilder();
         private final BlockingQueue<String> queue;
+        private final Integer id;
 
-        public AIWebSocketListener(String question, List<RoleContent> historyList, BlockingQueue<String> queue) {
+        public AIWebSocketListener(String question, BlockingQueue<String> queue, Integer id) {
             this.question = question;
-            this.historyList = historyList;
             this.queue = queue;
+            this.id = id;
         }
 
 
         @Override
         public void onOpen(@NotNull WebSocket webSocket, @NotNull Response response) {
-           //发送消息
+            //发送消息
             JSONObject requestJson = new JSONObject();
 
 
@@ -160,19 +147,19 @@ public class BigModel {
             JSONObject message = new JSONObject();
             JSONArray text = new JSONArray();
 
-            // 历史问题获取
-            if (historyList.size() > 0) {
-                for (RoleContent tempRoleContent : historyList) {
-                    text.add(JSON.toJSON(tempRoleContent));
-                }
-            }
+            //添加历史记录到要发送的请求里
+            List<String> history = getHistory(this.id);
+            text.addAll(history);
+
 
             // 最新问题
             RoleContent roleContent = new RoleContent();
             roleContent.role = "user";
             roleContent.content = question;
             text.add(JSON.toJSON(roleContent));
-            historyList.add(roleContent);
+
+            //historyList.add(roleContent);
+            addHistory(roleContent, this.id);
 
 
             message.put("text", text);
@@ -209,14 +196,11 @@ public class BigModel {
                 totalAnswer.append(temp.content);
             }
             if (myJsonParse.header.status == 2) {
-                // 可以关闭连接，释放资源
-                if (!canAddHistory(historyList)) {
-                    historyList.remove(0);
-                }
-                RoleContent roleContent = new  RoleContent();
+                //将总回答添加进历史
+                RoleContent roleContent = new RoleContent();
                 roleContent.setRole("assistant");
                 roleContent.setContent(totalAnswer.toString());
-                historyList.add(roleContent);
+                addHistory(roleContent, this.id);
                 webSocket.close(1000, "");
                 try {
                     queue.put("");
@@ -228,6 +212,36 @@ public class BigModel {
 
     }
 
+
+    //添加对话历史  太长则移除
+    private static void addHistory(RoleContent roleContent, Integer id) {
+        String key = AI_HISTORY + id;
+        ListOperations<String, String> opsForList = redisTemplate.opsForList();
+        Long size = opsForList.size(key);
+        if (size != null && size >= 10000) {
+            for (int i = 0; i < 5; i++) {
+                opsForList.leftPop(key);
+            }
+        }
+
+        opsForList.rightPush(key, JSON.toJSONString(roleContent));//右边进左边出   ooooooooo o<- 最右最新
+    }
+
+    //获取对话历史
+    private static List<String> getHistory(Integer id) {
+        String key = AI_HISTORY + id;
+        ListOperations<String, String> opsForList = redisTemplate.opsForList();
+        Long size = opsForList.size(key);
+        if (size == null) {
+            return new ArrayList<>();
+        }
+        return opsForList.range(key, 0, size - 1);
+    }
+
+    private static void removeHistory(Integer id) {
+        log.info("移除历史");
+        redisTemplate.delete(AI_HISTORY + id);
+    }
 
 
     //todo 解析json数据的含义
@@ -243,7 +257,7 @@ public class BigModel {
     }
 
     private static class Payload {
-       Choices choices;
+        Choices choices;
     }
 
     private static class Choices {
@@ -255,7 +269,7 @@ public class BigModel {
         String content;
     }
 
-    private static class RoleContent {
+     public static class RoleContent {
         String role;
         String content;
 

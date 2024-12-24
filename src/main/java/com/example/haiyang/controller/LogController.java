@@ -23,7 +23,7 @@ public class LogController {
 
     @PostMapping("/save")
     public R saveLog(@RequestBody Log myLog){
-        log.info("存储信息");
+        log.info("存储记事簿信息");
         return service.saveLog(myLog);
     }
 

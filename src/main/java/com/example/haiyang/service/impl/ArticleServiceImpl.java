@@ -42,6 +42,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             return R.success(articles);
         }
 
+        //redis缓存
         LambdaQueryWrapper<Article> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(type != null, Article::getType, type);
         List<Article> list = list(wrapper);
@@ -55,11 +56,12 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     public R addArticle(Article article) {
         if(article.getArticleUrl() == null || article.getImgUrl() == null
                 || article.getType() == null || article.getTitle() == null){
-            return R.fail();
+            return R.failMsg("文章内容不完整!");
         }
         save(article);
 
         Integer type = article.getType();
+        //移除redis缓存
         template.delete(ARTICLE_TYPE + type);
 
         return R.success();

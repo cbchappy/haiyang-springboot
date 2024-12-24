@@ -26,9 +26,6 @@ public class CommonController {
     @PostMapping("/file")
     public R uploadFile(@RequestParam MultipartFile file){
         log.info("上传文件");
-        if(file == null){
-            log.error("上传的文件为空!");
-        }
         return service.uploadFile(file);
     }
 }

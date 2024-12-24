@@ -25,13 +25,13 @@ public class ArticleController {
 
     @GetMapping("/{type}")
     public R getByType(@PathVariable Integer type){
-        log.debug("根据类型获取文章");
+        log.info("根据类型获取文章");
         return service.getByType(type);
     }
 
     @PostMapping("/add")
     public R addArticle(@RequestBody Article article){
-        log.debug("添加文章");
+        log.info("添加文章");
         return service.addArticle(article);
     }
 

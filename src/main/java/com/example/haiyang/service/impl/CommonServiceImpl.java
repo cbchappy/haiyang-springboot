@@ -18,8 +18,10 @@ import org.springframework.web.multipart.MultipartFile;
 public class CommonServiceImpl implements ICommonService {
     @Override
     public R uploadFile(MultipartFile file) {
-        log.info("name:{}", file.getName());
-        log.info("originalName:{}", file.getOriginalFilename());
+        if(file == null || file.isEmpty()){
+            return R.failMsg("上传的文件不能为空!");
+        }
+
         int index = file.getOriginalFilename().lastIndexOf(".");
         String suffix = file.getOriginalFilename().substring(index );
         String key = "avatar/" + UUID.randomUUID() + suffix;

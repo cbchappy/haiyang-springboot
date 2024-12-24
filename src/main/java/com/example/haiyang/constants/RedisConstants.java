@@ -13,4 +13,7 @@ public class RedisConstants {
     //根据类型获取文章
     public final static String ARTICLE_TYPE = "article:type:";
 
+    //存储ai对话历史
+    public final static String AI_HISTORY = "aiHistory:";
+
 }

@@ -28,20 +28,21 @@ public class UserController {
 
     @PostMapping("/login")
     public R login(@RequestBody LoginDTO loginDTO){
-        log.info("手机号{}进行登录", loginDTO.getNumber());
+        log.info("账号{}进行登录", loginDTO.getNumber());
         return service.login(loginDTO);
     }
 
 
     @PostMapping("/signIn")
     public R signIn(@RequestBody SignInDTO signInDTO){
-        log.info("用户{}注册", signInDTO.getNumber());
+        String number = signInDTO.getNumber();
+        log.info("用户{}注册", number == null ? "" : number);
         return service.signIn(signInDTO);
     }
 
     @PostMapping("/update")
     public R update(@RequestBody User user){
-        log.info("更新用户");
+        log.info("更新用户信息");
         return service.updateUser(user);
     }
 
