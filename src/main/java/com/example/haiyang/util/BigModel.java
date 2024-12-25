@@ -125,12 +125,10 @@ public class BigModel {
             this.id = id;
         }
 
-
         @Override
         public void onOpen(@NotNull WebSocket webSocket, @NotNull Response response) {
             //发送消息
             JSONObject requestJson = new JSONObject();
-
 
             JSONObject header = new JSONObject();  // header参数
             header.put("app_id", appid);
@@ -149,16 +147,16 @@ public class BigModel {
 
             //添加历史记录到要发送的请求里
             List<String> history = getHistory(this.id);
-            text.addAll(history);
-
-
+            for (String s : history) {
+                text.add(JSON.parseObject(s, RoleContent.class));//直接添加stringJson进去会导致出现划线, 引起错误
+            }
             // 最新问题
             RoleContent roleContent = new RoleContent();
             roleContent.role = "user";
             roleContent.content = question;
             text.add(JSON.toJSON(roleContent));
 
-            //historyList.add(roleContent);
+            //将最新问题也添加进历史记录
             addHistory(roleContent, this.id);
 
 
@@ -180,8 +178,15 @@ public class BigModel {
 
             //校验是否发生错误
             if (myJsonParse.header.code != 0) {
-                log.error("发生错误，错误码为：" + myJsonParse.header.code);
-                log.error("本次请求的sid为：" + myJsonParse.header.sid);
+                log.error("发生错误，错误码为:" + myJsonParse.header.code);
+                log.error("本次请求的sid为:" + myJsonParse.header.sid);
+                //进行错误处理
+                try {
+                    queue.put("本次回答出现未知错误");
+                    queue.put("");
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
                 webSocket.close(1000, "");
             }
             List<Text> textList = myJsonParse.payload.choices.text;

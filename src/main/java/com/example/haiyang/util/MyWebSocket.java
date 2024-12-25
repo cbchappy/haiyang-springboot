@@ -44,7 +44,6 @@ public class MyWebSocket {
                     try {
                         String v = queue.take();
                         if(v.equals("")){
-                            BigModel.closeBigModel(userId);
                             break;
                         }
                         jsonObject.addProperty("text", v);

@@ -1,15 +1,19 @@
 package com.example.haiyang;
 
+import com.alibaba.fastjson.JSON;
+import com.example.haiyang.entity.User;
+import com.example.haiyang.util.BigModel;
 import com.example.haiyang.util.MyUtil;
 
 public class Rethrowing {
     public static void f() throws Exception {
 
-        Exception exception = new Exception("Thrown from f()");
-        Throwable c1 = new Throwable("这是cause1");
-        c1.initCause(new Throwable("这是cause2"));
-        exception.initCause(c1);
-        throw exception;
+        BigModel.RoleContent roleContent = new BigModel.RoleContent();
+        roleContent.setContent("odoodoq");
+        roleContent.setRole("user");
+        String s = JSON.toJSONString(roleContent);
+        System.out.println(s);
+        System.out.println(JSON.toJSON(roleContent));
     }
 
     public static void g() throws Exception {
