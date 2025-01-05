@@ -40,7 +40,7 @@ public class MyExceptionHandler {
         String requestURI = request.getRequestURI();
         log.error("请求地址 {},异常: {}", requestURI, String.valueOf(e));
 
-       return R.fail("服务器出现运行时异常:" + e.getMessage(), null);
+       return R.fail("服务器出现运行时异常" , null);
     }
 
 
@@ -49,9 +49,10 @@ public class MyExceptionHandler {
      * @param exception
      */
     @ExceptionHandler(value = Exception.class)
-    public R allException(Exception exception){
+    public R allException(Exception exception, HttpServletRequest request){
+        String requestURI = request.getRequestURI();
         String msg = exception.getMessage();
-        log.error("出现异常:{}", msg);
-        return R.fail("服务器出现系统异常:" + msg, null);
+        log.error("请求{}出现异常:{}", requestURI, msg);
+        return R.fail("服务器出现系统异常", null);
     }
 }

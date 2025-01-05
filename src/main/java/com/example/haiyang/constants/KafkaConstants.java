@@ -8,5 +8,5 @@ package com.example.haiyang.constants;
 public class KafkaConstants {
 
     public final static String OPERATE_LOG_TOPIC = "operate_log";
-    public final static String EXCEPTION_LOG_TOPIC = "exception_log";
+
 }

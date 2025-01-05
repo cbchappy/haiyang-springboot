@@ -9,6 +9,7 @@ import lombok.Data;
  */
 @Data
 public class R {
+
     private Integer code;//0 失败,  1 成功, -1 错误
 
     private String msg;
@@ -22,28 +23,33 @@ public class R {
     }
 
     public static R success(String msg, Object data){
-        return new R(1, msg, data);
+        return new R(Code.success, msg, data);
     }
 
     public static R fail(String msg, Object data){
-        return new R(0, msg, data);
+        return new R(Code.fail, msg, data);
     }
 
     public static R success(Object data){
-        return new R(1, "请求成功", data);
+        return new R(Code.success, "请求成功", data);
     }
 
 
     public static R failMsg(String msg){
-        return new R(0, msg, null);
+        return new R(Code.fail, msg, null);
     }
 
     public static R success(){
-        return new R(1, "请求成功", null);
+        return new R(Code.success, "请求成功", null);
     }
 
     public static R successMsg(String msg){
-        return new R(1, msg, null);
+        return new R(Code.success, msg, null);
+    }
+
+    public static  class Code{
+        public static int fail = 0;
+        public static int success = 1;
     }
 
 

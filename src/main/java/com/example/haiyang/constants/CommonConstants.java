@@ -11,6 +11,8 @@ public class CommonConstants {
 
     public final static String SALT = "hduwnagfjflvnsfew";//token加盐
 
+    public final static String DEFAULT_SIGNATURE = "我的个性签名";
+
     //腾讯对象存储 todo 开放仓库记得清除掉
     public static String cosSecretId = "AKIDzpUyEJFyYxDH6ix1rUJvJSM1VowTpwrX";
     //腾讯对象存储

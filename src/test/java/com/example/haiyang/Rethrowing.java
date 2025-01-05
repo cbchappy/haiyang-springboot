@@ -1,9 +1,7 @@
 package com.example.haiyang;
 
 import com.alibaba.fastjson.JSON;
-import com.example.haiyang.entity.User;
 import com.example.haiyang.util.BigModel;
-import com.example.haiyang.util.MyUtil;
 
 public class Rethrowing {
     public static void f() throws Exception {

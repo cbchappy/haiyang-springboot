@@ -3,6 +3,7 @@ package com.example.haiyang.service.impl;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.MD5;
+import cn.hutool.extra.spring.SpringUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.haiyang.constants.CommonConstants;
 import com.example.haiyang.dto.LoginDTO;
@@ -16,6 +17,7 @@ import com.example.haiyang.util.MyUtil;
 import com.example.haiyang.util.R;
 import com.example.haiyang.constants.RedisConstants;
 import com.example.haiyang.vo.LoginVO;
+import com.example.haiyang.vo.UpdateUserVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
+import static com.example.haiyang.constants.CommonConstants.DEFAULT_SIGNATURE;
 import static com.example.haiyang.constants.CommonConstants.SALT;
 
 /**
@@ -54,7 +57,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         }
 
         //进行md5加密
-
         String md5PW = MyUtil.digest(loginDTO.getPassword());
         if(!md5PW.equals(user.getPassword())){
             return R.failMsg("输入密码错误");
@@ -70,6 +72,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         loginVO.setNumber(user.getNumber());
         loginVO.setAvatar(user.getAvatar());
         loginVO.setNickname(user.getNickname());
+        loginVO.setSignature(user.getSignature());
 
         return R.success("登录成功", loginVO);
     }
@@ -97,17 +100,24 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         newUser.setPassword(new MD5().digestHex16(signInDTO.getPassword()));
         newUser.setNickname("user_" + RandomUtil.randomString(5));
         newUser.setAvatar(CommonConstants.DEFAULT_AVATAR);
+        newUser.setSignature(DEFAULT_SIGNATURE);
         save(newUser);
 
-        return R.success(signInDTO);
+        return R.success();
     }
 
     @Override
     public R updateUser(User user) {
-
+        //todo 优化
         user.setId(MyThreadLocal.getUserId());
-        updateById(user);
-        return R.success("更新成功", user);
+
+        User r = this.getById(user.getId());
+        UpdateUserVo userVo = new UpdateUserVo();
+        userVo.setAvatar(r.getAvatar());
+        userVo.setSignature(r.getSignature());
+        userVo.setNickname(r.getNickname());
+
+        return R.success("更新成功", userVo);
     }
 
     @Override

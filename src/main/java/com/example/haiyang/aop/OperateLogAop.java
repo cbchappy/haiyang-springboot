@@ -1,32 +1,30 @@
 package com.example.haiyang.aop;
 
 import cn.hutool.json.JSONUtil;
-import com.alibaba.fastjson.JSONArray;
 import com.example.haiyang.constants.KafkaConstants;
-import com.example.haiyang.entity.ExceptionLog;
+
 import com.example.haiyang.entity.OperateLog;
-import com.example.haiyang.service.IExceptionLogService;
-import com.example.haiyang.service.IOperateLogService;
 import com.example.haiyang.util.MyThreadLocal;
 import com.example.haiyang.util.MyUtil;
+import com.example.haiyang.util.R;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.servlet.mvc.condition.RequestConditionHolder;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.function.Consumer;
+
 
 /**
  * @Author Cbc
@@ -50,65 +48,95 @@ public class OperateLogAop {
 
     @Around(value = "operExceptionLogPoinCut()")
     public Object recordLog(ProceedingJoinPoint joinPoint) throws Throwable {
-        log.debug("aop代理, 记录操作日志");
+
+        // 获取RequestAttributes
         OperateLog operateLog = new OperateLog();
-        operateLog.setUserId(MyThreadLocal.getUserId());
-        operateLog.setOperateTime(LocalDateTime.now());
-        operateLog.setOperateClass(joinPoint.getTarget().getClass().getName());//操作类名
-        operateLog.setOperateMethod(joinPoint.getSignature().getName());//操作方法名
-        operateLog.setOperateParameters(JSONUtil.toJsonStr(joinPoint.getArgs()));//操作参数
+        operateLog.setUserId(MyThreadLocal.getUserId());//userId
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
+        if (requestAttributes != null) {
+            improveOperateLog(requestAttributes.getRequest(), operateLog);
+        }
+        operateLog.setCreateTime(LocalDateTime.now());
+        Signature signature = joinPoint.getSignature();
+        operateLog.setClassName(joinPoint.getTarget().getClass().getName());
+        operateLog.setMethodName(signature.getName());
+        Object[] args = joinPoint.getArgs();
+        if(args != null){
+            String[] methodType = new String[args.length];
+            for (int i = 0; i < methodType.length; i++) {
+                methodType[i] = args[i].getClass().getName();
+            }
+            operateLog.setParamType(JSONUtil.toJsonStr(methodType));
+        }
+
+
         long start = System.currentTimeMillis();
+        Throwable e = null;
 
-        Object res = joinPoint.proceed();
+        Object res = null;
+        try {
+            res = joinPoint.proceed();
+        } catch (Throwable t) {
+            e = t;
+            throw new RuntimeException(e);
+        }finally {
+            recordLog(e, operateLog, start, res);
+        }
 
-        long end = System.currentTimeMillis();
-        operateLog.setConsumingTime(end - start);//花费的时间
-        operateLog.setRes(JSONUtil.toJsonStr(res));
-        kafkaTemplate.send(KafkaConstants.OPERATE_LOG_TOPIC, JSONUtil.toJsonStr(operateLog));
         return res;
     }
 
+    private static void improveOperateLog(HttpServletRequest request, OperateLog operateLog){
+        operateLog.setRequestMethod(request.getMethod());
+        operateLog.setRequestParams(JSONUtil.toJsonStr(request.getParameterMap()));
+        operateLog.setRequestUrl(request.getRequestURL().toString());
 
-    @AfterThrowing(value = "operExceptionLogPoinCut()", throwing = "e", argNames = "joinPoint,e")//todo !!!!!!!!!
-    //todo 方法名顺序要正常
-    public void ExceptionRecord(JoinPoint joinPoint, Throwable e) {
-
-        log.debug("aop代理, 记录操作异常日志");
-
-        ExceptionLog exceptionLog = new ExceptionLog();
-        exceptionLog.setUserId(MyThreadLocal.getUserId());//用户id
-        exceptionLog.setCreateTime(LocalDateTime.now());//创建时间
-
-        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
-
-        exceptionLog.setUrl(request.getRequestURL().toString());//url
-        exceptionLog.setParams(JSONUtil.toJsonStr(request.getParameterMap()));//参数
-        exceptionLog.setRequestMethod(request.getMethod());//请求方式
-        // 获取请求体
-        BufferedReader reader = null;
         try {
-            reader = request.getReader();
-            String line;
-            StringBuilder content = new StringBuilder();
-            while ((line = reader.readLine()) != null) {
-                content.append(line);
-            }
-            exceptionLog.setRequestBody(content.toString());//请求体--json模式 不包括文件
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
+            BufferedReader reader = request.getReader();
+            StringBuilder builder = new StringBuilder();
+            reader.lines().forEach(builder::append);
+            operateLog.setRequestBody(builder.toString());
+        } catch (Exception ignored) {
+
         }
+    }
 
-        exceptionLog.setExceptionName(e.getClass().getName());//exception名
-        String content = MyUtil.getThrowableContent(e);
-        exceptionLog.setExceptionContent(content);//exception具体信息
-        exceptionLog.setOperateMethod(joinPoint.getSignature().getName());//方法名
+    private void recordLog(Throwable e, OperateLog operateLog, long start, Object res){
+        long end = System.currentTimeMillis();
+        operateLog.setConsumeTime((int) (end - start));
+        if(e != null){
+            operateLog.setResType(OperateLog.ResTypeCode.exception);
+            res = MyUtil.getThrowableContent(e);
+        }else {
+            R r = (R) res;
+            if(r.getCode() == R.Code.success){
+                operateLog.setResType(OperateLog.ResTypeCode.success);
+            }else {
+                operateLog.setResType(OperateLog.ResTypeCode.fail);
+            }
+        }
+        String jsonStr = JSONUtil.toJsonStr(res);
+        operateLog.setResult(jsonStr);
+        String opLog = JSONUtil.toJsonStr(operateLog);
 
-        kafkaTemplate.send(KafkaConstants.EXCEPTION_LOG_TOPIC, JSONUtil.toJsonStr(exceptionLog));
+        log.info("\n详细请求信息日志:{}", opLog);
 
+        kafkaTemplate.send(KafkaConstants.OPERATE_LOG_TOPIC, opLog);
     }
 
 
+
+
+
+
+
+
+//    @AfterThrowing(value = "operExceptionLogPoinCut()", throwing = "e", argNames = "joinPoint,e")//todo !!!!!!!!!
+//    //todo 方法名顺序要正常
+//    public void ExceptionRecord(JoinPoint joinPoint, Throwable e) {
+//
+//
+//    }
+
+
 }
-//id userId content create_time status websocket
-//exception_log ---> id userId exception msg class method params create_time

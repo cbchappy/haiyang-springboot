@@ -159,10 +159,8 @@ public class BigModel {
             //将最新问题也添加进历史记录
             addHistory(roleContent, this.id);
 
-
             message.put("text", text);
             payload.put("message", message);
-
 
             requestJson.put("header", header);
             requestJson.put("parameter", parameter);

@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * </p>
  *
  * @author Chen
- * @since 2024-11-15
+ * @since 2025-01-05
  */
 public interface IOperateLogService extends IService<OperateLog> {
 

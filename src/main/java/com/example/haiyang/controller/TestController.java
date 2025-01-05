@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.haiyang.entity.Test;
 import com.example.haiyang.service.ITestService;
 import com.example.haiyang.util.R;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -42,7 +43,7 @@ public class TestController {
     }
 
     @PostMapping("/exception")
-    public R testExceptionLog(){
+    public R testExceptionLog(@RequestParam String name, HttpServletRequest request){
         log.info("testExceptionLog");
         try {
             g();

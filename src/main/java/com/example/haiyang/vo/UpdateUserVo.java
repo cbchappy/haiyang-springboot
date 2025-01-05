@@ -1,21 +1,14 @@
 package com.example.haiyang.vo;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
  * @Author Cbc
- * @DateTime 2024/10/16 22:37
+ * @DateTime 2024/12/28 19:51
  * @Description
  */
 @Data
-public class LoginVO {
-    private String wxToken;
-
-    private String userId;
-
-    private String number;
-
+public class UpdateUserVo {
     private String avatar;
 
     private String nickname;

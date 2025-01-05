@@ -34,14 +34,16 @@ public class MyInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        log.info("请求{}进入了拦截器!", request.getRequestURI());
+        String uri = request.getRequestURI();
+        String method = request.getMethod();
+        log.info("请求 {}:{} 进入了拦截器!", method, uri);
         String token = request.getHeader(RequestConstants.HEADER_TOKEN);
         String userId = request.getHeader(RequestConstants.HEADER_USERID);
          userId = userId == null ? "" : userId;
         String reToken = template.opsForValue().getAndExpire(RedisConstants.LOGIN + userId, 30, TimeUnit.MINUTES);
 
         if (reToken == null || !reToken.equals(token)) {
-            log.info("权限校验不通过, 拒绝访问");
+            log.info("请求{}权限校验不通过, 拒绝访问", uri);
             response.setCharacterEncoding("utf-8");
             response.getWriter().write(JSONUtil.toJsonStr(R.failMsg("没有权限")));
             response.setContentType("application/json");

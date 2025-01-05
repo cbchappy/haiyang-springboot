@@ -32,8 +32,8 @@ spring:
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
 #端口
-#server:
-#  port: 8080
+server:
+  port: 8080
 #  ssl:
 #    key-store-type: PKCS12
 #    key-store-password: r4novnnw

@@ -51,6 +51,12 @@ public class User implements Serializable {
     private String avatar;
 
     /**
+     * 个性签名
+     */
+    @TableField("signature")
+    private String signature;
+
+    /**
      * 创建时间
      */
     @TableField("create_time")

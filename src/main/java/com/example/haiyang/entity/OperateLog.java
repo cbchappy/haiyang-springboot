@@ -15,7 +15,7 @@ import lombok.Setter;
  * </p>
  *
  * @author Chen
- * @since 2024-11-15
+ * @since 2025-01-05
  */
 @Getter
 @Setter
@@ -25,32 +25,83 @@ public class OperateLog implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    private Integer id;
 
     /**
-     * 操作用户
+     * 用户id
      */
-    @TableField("userId")
+    @TableField("user_id")
     private Integer userId;
 
-    @TableField("operate_time")
-    private LocalDateTime operateTime;
-
-    @TableField("operate_class")
-    private String operateClass;
-
-    @TableField("operate_method")
-    private String operateMethod;
-
-    @TableField("operate_parameters")
-    private String operateParameters;
-
-    @TableField("consuming_time")
-    private Long consumingTime;//单位: ms
+    /**
+     * http请求method
+     */
+    @TableField("request_method")
+    private String requestMethod;
 
     /**
-     * 返回结果
+     * 请求路径
      */
-    @TableField("res")
-    private String res;
+    @TableField("request_url")
+    private String requestUrl;
+
+    /**
+     * 请求参数
+     */
+    @TableField("request_params")
+    private String requestParams;
+
+    /**
+     * 请求体
+     */
+    @TableField("request_body")
+    private String requestBody;
+
+    /**
+     * 操作的类
+     */
+    @TableField("class_name")
+    private String className;
+
+    /**
+     * 操作的方法
+     */
+    @TableField("method_name")
+    private String methodName;
+
+    /**
+     * 操作的方法的参数类型
+     */
+    @TableField("param_type")
+    private String paramType;
+
+    /**
+     * 操作耗时, 单位为ms
+     */
+    @TableField("consume_time")
+    private Integer consumeTime;
+
+    /**
+     * 操作结果 0->fail、  1->sucess、 2->exception 
+     */
+    @TableField("res_type")
+    private Integer resType;
+
+    /**
+     * 结果, 如果报错则存储的是报错信息
+     */
+    @TableField("result")
+    private String result;
+
+    /**
+     * 创建时间
+     */
+    @TableField("create_time")
+    private LocalDateTime createTime;
+
+    public static class ResTypeCode{
+        public static int fail = 0;
+        public static int success = 1;
+        public static int exception = 2;
+    }
 }
