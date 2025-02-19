@@ -2,6 +2,8 @@ package com.example.haiyang.controller;
 
 
 import com.example.haiyang.service.ICommonService;
+import com.example.haiyang.util.Desc;
+import com.example.haiyang.util.MyThreadLocal;
 import com.example.haiyang.util.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +25,11 @@ public class CommonController {
 
     @Autowired
     ICommonService service;
+
+    @Desc("上传文件")
     @PostMapping("/file")
     public R uploadFile(@RequestParam MultipartFile file){
-        log.info("上传文件");
+        log.info("userId:{}-上传文件", MyThreadLocal.getUserId());
         return service.uploadFile(file);
     }
 }

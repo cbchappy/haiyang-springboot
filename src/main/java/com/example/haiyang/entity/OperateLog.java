@@ -99,6 +99,12 @@ public class OperateLog implements Serializable {
     @TableField("create_time")
     private LocalDateTime createTime;
 
+    /**
+     * 操作描述
+     */
+    @TableField("description")
+    private String description;
+
     public static class ResTypeCode{
         public static int fail = 0;
         public static int success = 1;

@@ -4,32 +4,31 @@ import cn.hutool.json.JSONUtil;
 import com.example.haiyang.constants.KafkaConstants;
 
 import com.example.haiyang.entity.OperateLog;
+import com.example.haiyang.util.Desc;
 import com.example.haiyang.util.MyThreadLocal;
 import com.example.haiyang.util.MyUtil;
 import com.example.haiyang.util.R;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.*;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.function.Consumer;
+
 
 
 /**
  * @Author Cbc
  * @DateTime 2024/11/15 20:05
- * @Description 记录操作日志和异常日志
+ * @Description 记录操作日志
  */
 @Aspect
 @Component
@@ -47,7 +46,7 @@ public class OperateLogAop {
 
 
     @Around(value = "operExceptionLogPoinCut()")
-    public Object recordLog(ProceedingJoinPoint joinPoint) throws Throwable {
+    public Object recordLog(ProceedingJoinPoint joinPoint) {
 
         // 获取RequestAttributes
         OperateLog operateLog = new OperateLog();
@@ -56,10 +55,16 @@ public class OperateLogAop {
         if (requestAttributes != null) {
             improveOperateLog(requestAttributes.getRequest(), operateLog);
         }
-        operateLog.setCreateTime(LocalDateTime.now());
-        Signature signature = joinPoint.getSignature();
+
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        Desc desc = signature.getMethod().getAnnotation(Desc.class);
+        if(desc != null){
+            operateLog.setDescription(desc.value());
+        }
         operateLog.setClassName(joinPoint.getTarget().getClass().getName());
         operateLog.setMethodName(signature.getName());
+        operateLog.setCreateTime(LocalDateTime.now());
+
         Object[] args = joinPoint.getArgs();
         if(args != null){
             String[] methodType = new String[args.length];
@@ -124,19 +129,6 @@ public class OperateLogAop {
         kafkaTemplate.send(KafkaConstants.OPERATE_LOG_TOPIC, opLog);
     }
 
-
-
-
-
-
-
-
-//    @AfterThrowing(value = "operExceptionLogPoinCut()", throwing = "e", argNames = "joinPoint,e")//todo !!!!!!!!!
-//    //todo 方法名顺序要正常
-//    public void ExceptionRecord(JoinPoint joinPoint, Throwable e) {
-//
-//
-//    }
 
 
 }

@@ -40,15 +40,17 @@ public class MyWebSocket {
 
         MyWebSocket webSocket = webSocketMap.get(userId);
         if (webSocket != null) {
+            StringBuilder builder = new StringBuilder();
                 while (true){
                     try {
                         String v = queue.take();
+                        builder.append(v);
                         if(v.equals("")){
+                            log.info("【websocket消息】ai回答给id为{}的用户:{}", userId, builder);
                             break;
                         }
                         jsonObject.addProperty("text", v);
                         String r = jsonObject.toString();
-                        log.info("返回消息：{}", r);
                         webSocket.session.getBasicRemote().sendText(r);
                     } catch (Exception e) {
                         throw new RuntimeException(e);
@@ -61,11 +63,11 @@ public class MyWebSocket {
 
     @OnOpen
     public void onOpen(Session session) {
-        log.info("进入opOpen的线程名字为:{}", Thread.currentThread().getName());
+
         this.userId = MyThreadLocal.getUserId();
         this.session = session;
         webSocketMap.put(userId, this);
-        System.out.println("【websocket消息】有新的连接,连接id=" + userId + ":" + this);
+        log.info("【websocket消息】有新的连接,连接id={}", userId);
     }
 
     //前端关闭时一个websocket时
@@ -73,12 +75,12 @@ public class MyWebSocket {
     public void onClose() {
         webSocketMap.remove(userId);
         BigModel.closeBigModel(userId);//关闭以移除历史对话
-        System.out.println("【websocket消息】连接断开:" + userId);
+        log.info("【websocket消息】用户id:{}断开连接", userId);
     }
 
     @OnError
     public void onError(Session session, Throwable error) {
-        System.out.println("【websocket消息】WebSocket发生错误，错误信息为：" + error.getMessage());
+        log.error("【websocket消息】WebSocket发生错误，错误信息为:{}", error.getMessage());
         error.printStackTrace();
     }
 
@@ -86,13 +88,14 @@ public class MyWebSocket {
     @OnMessage
     public void onMessage(String message) {
 
-        log.info("前端发来的websocket信息:{}", message);
+
 
         JsonParser jsonParser = new JsonParser();
         JsonElement jsonElement = jsonParser.parse(message);
         JsonObject jsonObject = jsonElement.getAsJsonObject();
         String msg = jsonObject.get("text").getAsString();
-        log.info("msg:{}", msg);
+
+        log.info("【websocket消息】id为{}的用户询问ai:{}", userId, msg);
 
 
         BlockingQueue<String> queue = BigModel.sendToBigModel(msg, userId);

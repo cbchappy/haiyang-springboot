@@ -87,6 +87,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         if(StrUtil.isBlankIfStr(signInDTO.getPassword())){
             return R.failMsg("输入密码格式不合理!");
         }
+        if(signInDTO.getNumber().length() < 5){
+            return R.failMsg("账号长度不能小于5");
+        }
+        if(signInDTO.getPassword().length() < 8){
+            return R.failMsg("密码长度不能小于8");
+        }
 
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(User::getNumber, signInDTO.getNumber());

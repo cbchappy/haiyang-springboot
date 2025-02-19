@@ -10,7 +10,7 @@ import lombok.Data;
 @Data
 public class R {
 
-    private Integer code;//0 失败,  1 成功, -1 错误
+    private Integer code;//0 失败,  1 成功
 
     private String msg;
 

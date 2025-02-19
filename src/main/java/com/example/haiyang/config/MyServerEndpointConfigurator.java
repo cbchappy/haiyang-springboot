@@ -1,24 +1,16 @@
 package com.example.haiyang.config;
 
-import cn.hutool.json.JSONUtil;
+
 import com.example.haiyang.constants.RedisConstants;
 import com.example.haiyang.constants.RequestConstants;
-import com.example.haiyang.interceptor.MyInterceptor;
 import com.example.haiyang.util.MyThreadLocal;
-import com.example.haiyang.util.R;
 import jakarta.websocket.HandshakeResponse;
 import jakarta.websocket.server.HandshakeRequest;
 import jakarta.websocket.server.ServerEndpointConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -47,17 +39,15 @@ public class MyServerEndpointConfigurator extends ServerEndpointConfig.Configura
         String token = headers.get(RequestConstants.HEADER_TOKEN).get(0);
         String userId = headers.get(RequestConstants.HEADER_USERID).get(0);
 
-        log.info("{}进入了websocket拦截器!", request.getRequestURI());
+        log.info("请求:{}-进入了websocket拦截器!", request.getRequestURI());
 
 
         userId = userId == null ? "" : userId;
         String reToken = template.opsForValue().getAndExpire(RedisConstants.LOGIN + userId, 30, TimeUnit.MINUTES);
 
         if (reToken == null || !reToken.equals(token)) {
-            log.info("websocket权限校验不通过");
+            log.info("请求:{}-websocket权限校验不通过", request.getRequestURI());
             throw new RuntimeException("websocket请求无法通过权限校验");
-//            System.err.println("请求无法通过权限校验");
-//            return;
         }
         MyThreadLocal.setUserId(Integer.valueOf(userId));
 

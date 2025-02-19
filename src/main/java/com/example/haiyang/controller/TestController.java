@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.haiyang.entity.Test;
 import com.example.haiyang.service.ITestService;
+import com.example.haiyang.util.Desc;
 import com.example.haiyang.util.R;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -29,19 +30,22 @@ public class TestController {
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
 
+    @Desc("一般测试")
     @GetMapping("/test/{msg}")
     public R test(@PathVariable String msg) throws InterruptedException {
       log.info("访问了test");
-        Thread.sleep(1000);
+      Thread.sleep(45);
         return R.success("成功了", null);
     }
 
+    @Desc("测试kafka")
     @GetMapping("/kafka")
     public R testKafka(){
 
         return R.success("成功");
     }
 
+    @Desc("测试出现错误")
     @PostMapping("/exception")
     public R testExceptionLog(@RequestParam String name, HttpServletRequest request){
         log.info("testExceptionLog");
