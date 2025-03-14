@@ -16,4 +16,6 @@ public class RedisConstants {
     //存储ai对话历史
     public final static String AI_HISTORY = "aiHistory:";
 
+    public final static String ARTICLE_LOCK = "lock:article:";
+
 }
