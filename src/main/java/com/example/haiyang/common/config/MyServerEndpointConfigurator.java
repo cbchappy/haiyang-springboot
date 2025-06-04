@@ -1,8 +1,8 @@
-package com.example.haiyang.config;
+package com.example.haiyang.common.config;
 
 
-import com.example.haiyang.constants.RedisConstants;
-import com.example.haiyang.constants.RequestConstants;
+import com.example.haiyang.common.constants.RedisConstants;
+import com.example.haiyang.common.constants.RequestConstants;
 import com.example.haiyang.util.MyThreadLocal;
 import jakarta.websocket.HandshakeResponse;
 import jakarta.websocket.server.HandshakeRequest;

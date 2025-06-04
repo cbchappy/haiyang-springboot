@@ -13,8 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.net.URL;
 
-import static com.example.haiyang.constants.CommonConstants.cosSecretId;
-import static com.example.haiyang.constants.CommonConstants.cosSecretKey;
+import static com.example.haiyang.common.constants.CommonConstants.cosSecretId;
+import static com.example.haiyang.common.constants.CommonConstants.cosSecretKey;
 
 
 /**

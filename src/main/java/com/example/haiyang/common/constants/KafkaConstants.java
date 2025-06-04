@@ -1,4 +1,4 @@
-package com.example.haiyang.constants;
+package com.example.haiyang.common.constants;
 
 /**
  * @Author Cbc
@@ -9,4 +9,5 @@ public class KafkaConstants {
 
     public final static String OPERATE_LOG_TOPIC = "operate_log";
 
+    public final static String AI_TOPIC = "ai_msg";
 }

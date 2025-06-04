@@ -16,6 +16,10 @@ public class MyThreadLocal {
         IdThreadLocal.set(id);
     }
 
+    public static void removeUserId(){
+        IdThreadLocal.remove();
+    }
+
 
 
 }

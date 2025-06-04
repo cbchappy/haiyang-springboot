@@ -150,6 +150,19 @@
             <artifactId>spring-kafka</artifactId>
         </dependency>
 
+        <!--缓存-->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>3.1.8</version> <!-- JDK11+使用3.x，JDK8使用2.x -->
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>33.1.0-jre</version> <!-- 2025年5月最新稳定版 -->
+        </dependency>
+
 
 
     </dependencies>

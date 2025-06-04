@@ -34,11 +34,11 @@ spring:
 #端口
 server:
   port: 8080
-# https证书配置
-#  ssl:
-#    key-store-type: PKCS12
-#    key-store-password: r4novnnw
-#    key-store: classpath:hhumarinegeology.top.pfx
+  tomcat:
+    threads:
+      max: 50
+    accept-count: 50
+    max-connections: 100
 
 #驼峰命名
 mybatis-plus:

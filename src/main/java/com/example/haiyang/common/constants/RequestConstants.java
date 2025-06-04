@@ -1,4 +1,4 @@
-package com.example.haiyang.constants;
+package com.example.haiyang.common.constants;
 
 /**
  * @Author Cbc

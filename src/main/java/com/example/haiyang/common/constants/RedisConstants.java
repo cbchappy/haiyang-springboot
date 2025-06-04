@@ -1,4 +1,4 @@
-package com.example.haiyang.constants;
+package com.example.haiyang.common.constants;
 
 /**
  * @Author Cbc
@@ -16,6 +16,12 @@ public class RedisConstants {
     //存储ai对话历史
     public final static String AI_HISTORY = "aiHistory:";
 
-    public final static String ARTICLE_LOCK = "lock:article:";
+    //用户请求频率
+    public final static String  USER_FREQUENCY_LIST = "user:frequency:list:";
+
+    //记录上一次时间
+    public final static String USER_FREQUENCY_TIME = "user:frequency:list:time";
+
+    public final static String BLACKLIST = "blacklist:";
 
 }

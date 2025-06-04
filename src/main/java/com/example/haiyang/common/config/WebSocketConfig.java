@@ -1,4 +1,4 @@
-package com.example.haiyang.config;
+package com.example.haiyang.common.config;
 
 
 import org.springframework.context.annotation.Bean;

@@ -1,8 +1,5 @@
 package com.example.haiyang;
 
-import cn.hutool.core.bean.BeanUtil;
-
-import cn.hutool.core.util.RandomUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -15,7 +12,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.util.List;
 
-import static com.example.haiyang.constants.RedisConstants.AI_HISTORY;
+import static com.example.haiyang.common.constants.RedisConstants.AI_HISTORY;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

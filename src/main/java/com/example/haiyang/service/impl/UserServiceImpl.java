@@ -3,9 +3,8 @@ package com.example.haiyang.service.impl;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.MD5;
-import cn.hutool.extra.spring.SpringUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.example.haiyang.constants.CommonConstants;
+import com.example.haiyang.common.constants.CommonConstants;
 import com.example.haiyang.dto.LoginDTO;
 import com.example.haiyang.dto.SignInDTO;
 import com.example.haiyang.entity.User;
@@ -15,7 +14,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.haiyang.util.MyThreadLocal;
 import com.example.haiyang.util.MyUtil;
 import com.example.haiyang.util.R;
-import com.example.haiyang.constants.RedisConstants;
+import com.example.haiyang.common.constants.RedisConstants;
 import com.example.haiyang.vo.LoginVO;
 import com.example.haiyang.vo.UpdateUserVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +24,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
-import static com.example.haiyang.constants.CommonConstants.DEFAULT_SIGNATURE;
-import static com.example.haiyang.constants.CommonConstants.SALT;
+import static com.example.haiyang.common.constants.CommonConstants.DEFAULT_SIGNATURE;
+import static com.example.haiyang.common.constants.CommonConstants.SALT;
 
 /**
  * <p>

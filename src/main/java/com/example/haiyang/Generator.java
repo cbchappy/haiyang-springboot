@@ -12,7 +12,7 @@ public class Generator {
 
     public static void main(String[] args) {
         //todo 端口改变
-        FastAutoGenerator.create("jdbc:mysql://8.136.101.132:3305/haiyang?useUnicode=true&characterEncoding=utf-8", "root", "123456")
+        FastAutoGenerator.create("jdbc:mysql://8.136.101.132:3306/haiyang?useUnicode=true&characterEncoding=utf-8", "haiyang", "haiyang-2025")
                 .globalConfig(builder -> {
                     builder.author("Chen") // 设置作者
                             .outputDir("src\\main\\java"); // 输出目录
@@ -26,7 +26,7 @@ public class Generator {
                             .xml("mappers"); // 设置 Mapper XML 文件包名
                 })
                 .strategyConfig(builder -> {
-                    builder.addInclude("operate_log") // 设置需要生成的表名
+                    builder.addInclude("chat") // 设置需要生成的表名
                             .entityBuilder()
                             .enableLombok() // 启用 Lombok
                             .enableTableFieldAnnotation() // 启用字段注解

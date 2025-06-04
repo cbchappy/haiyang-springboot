@@ -1,4 +1,4 @@
-package com.example.haiyang.config;
+package com.example.haiyang.common.config;
 
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;

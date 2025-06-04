@@ -1,7 +1,7 @@
-package com.example.haiyang.aop;
+package com.example.haiyang.common.aop;
 
 import cn.hutool.json.JSONUtil;
-import com.example.haiyang.constants.KafkaConstants;
+import com.example.haiyang.common.constants.KafkaConstants;
 
 import com.example.haiyang.entity.OperateLog;
 import com.example.haiyang.util.Desc;
@@ -11,7 +11,6 @@ import com.example.haiyang.util.R;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
