@@ -27,11 +27,10 @@ import static com.example.haiyang.common.constants.RedisConstants.AI_HISTORY;
 /**
  * @Author Cbc
  * @DateTime 2024/11/24 19:11
- * @Description 重新改写之前的BigModel  //todo redis存储暂时的历史   todo 存储redis出现错误 无法将数据存入redis
+ * @Description 重新改写之前的BigModel
  */
 @Slf4j
 public class BigModel {
-
 
     private static final String hostUrl = "https://spark-api.xf-yun.com/v3.5/chat";//模型不同, 地址也不同(domain也是)
     private static final String appid = "9dd2b260";
@@ -40,7 +39,7 @@ public class BigModel {
     private static final Gson gson = new Gson();
     //存储对话历史
 
-    private static final StringRedisTemplate redisTemplate ;
+    private static final StringRedisTemplate redisTemplate;
 
     //初始化redisTemplate
     static {
@@ -241,7 +240,7 @@ public class BigModel {
     }
 
 
-    //todo 解析json数据的含义
+    // 解析json数据的含义
     private static class JsonParse {
         Header header;
         Payload payload;
@@ -256,7 +255,7 @@ public class BigModel {
     private static class Payload {
         Choices choices;
     }
-
+//
     private static class Choices {
         List<Text> text;
     }

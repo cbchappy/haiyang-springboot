@@ -1,6 +1,7 @@
 package com.example.haiyang.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.example.haiyang.dto.ArticlePageDTO;
 import com.example.haiyang.entity.Article;
 import com.example.haiyang.util.R;
 
@@ -17,4 +18,12 @@ public interface IArticleService extends IService<Article> {
     R getByType(Integer type);
 
     R addArticle(Article article);
+
+    R getPage(ArticlePageDTO pageDTO);
+
+    R getArticleById(Integer id);
+
+    R deleteById(Integer id);
+
+    R update(Article article);
 }

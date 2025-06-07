@@ -2,12 +2,15 @@ package com.example.haiyang.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.haiyang.dao.ArticleMapper;
+import com.example.haiyang.dto.ArticlePageDTO;
 import com.example.haiyang.entity.Article;
 import com.example.haiyang.service.IArticleService;
 import com.example.haiyang.util.R;
 import com.example.haiyang.util.RedisBloomFilter;
+import com.example.haiyang.vo.ArticlePageVO;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import jakarta.annotation.PostConstruct;
@@ -97,6 +100,62 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         articleCache.asMap().remove(key);
         bloomFilter.add(String.valueOf(type));
 
+        return R.success();
+    }
+
+    @Override
+    public R getPage(ArticlePageDTO dto) {
+        LambdaQueryWrapper<Article> wrapper = new LambdaQueryWrapper<>();
+        wrapper.gt(Article::getId, dto.getLastId());
+        wrapper.orderByDesc(Article::getId);
+        Page<Article> page = new Page<>(dto.getPageNum(), dto.getPageSize());
+
+        ArticlePageVO vo = new ArticlePageVO();
+        List<Article> records = page.getRecords();
+        vo.setArticleList(records);
+        vo.setTotal(records.size());
+        vo.setLastIndex(records.get(records.size() - 1).getId());
+        vo.setPageNum(dto.getPageNum());
+        return R.success(vo);
+    }
+
+    @Override
+    public R getArticleById(Integer id) {
+        if(id == null){
+            return R.failMsg("文章id不能为空!");
+        }
+        return R.success(mapper.selectById(id));
+    }
+
+    @Override
+    public R deleteById(Integer id) {
+        if(id == null){
+            return R.failMsg("文章id不能为空!");
+        }
+        Article article = mapper.selectById(id);
+        if(article == null){
+            return R.failMsg("文章id错误!");
+        }
+        String key = ARTICLE_TYPE + article.getType();
+        mapper.deleteById(article);
+        articleCache.asMap().remove(key);
+        template.delete(key);
+        return R.success();
+    }
+
+    @Override
+    public R update(Article article) {
+        if(article.getId() == null){
+            return R.failMsg("文章id不能为空!");
+        }
+        Integer type = article.getType();
+        if(type == null){
+            return R.failMsg("文章类型不能为空");
+        }
+        updateById(article);
+        String key = ARTICLE_TYPE + article.getType();
+        articleCache.asMap().remove(key);
+        template.delete(key);
         return R.success();
     }
 
