@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @Author Cbc
- * @DateTime 2025/5/2 13:36
+ * @DateTime 2025/1/24 13:36
  * @Description 令牌桶限流
  */
 public class MyRateLimiter {

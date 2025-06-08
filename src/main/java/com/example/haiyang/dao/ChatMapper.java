@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * </p>
  *
  * @author Chen
- * @since 2025-06-01
+ * @since 2025-2-14
  */
 public interface ChatMapper extends BaseMapper<Chat> {
 

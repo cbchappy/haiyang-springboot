@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
  * </p>
  *
  * @author Chen
- * @since 2025-06-01
+ * @since 2025-2-14
  */
 @RestController
 @RequestMapping("/chat")

@@ -11,7 +11,7 @@ import java.util.List;
  * </p>
  *
  * @author Chen
- * @since 2025-06-01
+ * @since 2025-2-14
  */
 public interface IChatService extends IService<Chat> {
     /**

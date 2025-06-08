@@ -1,11 +1,8 @@
 package com.example.haiyang.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-
-import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.Getter;
@@ -17,37 +14,30 @@ import lombok.Setter;
  * </p>
  *
  * @author Chen
- * @since 2025-2-14
+ * @since 2025-2-17
  */
 @Getter
 @Setter
-@TableName("chat")
-public class Chat implements Serializable {
+@TableName("internship_base")
+public class InternshipBase implements Serializable {
 
-    @Serial
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId("id")
     private Integer id;
 
-    @TableField("userId")
-    private Integer userId;
+    @TableField("name")
+    private String name;
 
-    /**
-     * 0 是用户， 1是AI
-     */
-    @TableField("isAI")
-    private Boolean isAI;
+    @TableField("address")
+    private String address;
 
-    /**
-     * 对话内容
-     */
-    @TableField("msg")
-    private String msg;
+    @TableField("imgUrl")
+    private String imgUrl;
 
-    /**
-     * 创建时间
-     */
+    @TableField("description")
+    private String description;
+
     @TableField("create_time")
     private LocalDateTime createTime;
 }

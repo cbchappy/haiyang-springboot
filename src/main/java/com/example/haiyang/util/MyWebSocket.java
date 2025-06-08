@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 
-
+import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -55,6 +55,15 @@ public class MyWebSocket {
                         throw new RuntimeException(e);
                     }
                 }
+        }
+    }
+
+    public static void sendTask(Integer taskId, Integer userId){
+        MyWebSocket webSocket = webSocketMap.get(userId);
+        try {
+            webSocket.session.getBasicRemote().sendText("task:" + taskId);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

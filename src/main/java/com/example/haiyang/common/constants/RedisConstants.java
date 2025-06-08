@@ -24,4 +24,16 @@ public class RedisConstants {
 
     public final static String BLACKLIST = "blacklist:";
 
+
+    public final static String HOT_POST_IDS = "post:hot:ids";
+
+    public final static String BLOOM_USER_POST = "bloom:userPost";
+
+    public final static String POST_IDS = "post:ids";
+
+    public final static String HOT_POST_MAP = "post:hot:map";
+
+    public final static String USER_LIKE_POST = "user:like:post";
+
+    public final static String TASK_REMIND = "task_remind";
 }

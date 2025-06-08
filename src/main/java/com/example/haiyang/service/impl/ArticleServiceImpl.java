@@ -41,7 +41,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     ArticleMapper mapper;
 
 
-    private Cache<String, List<Article>> articleCache = Caffeine.newBuilder()
+    private final Cache<String, List<Article>> articleCache = Caffeine.newBuilder()
             .maximumSize(10000) // 最大容量
             .expireAfterAccess(10, TimeUnit.MINUTES) // 写入后10分钟过期
             .build();
@@ -108,14 +108,24 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         LambdaQueryWrapper<Article> wrapper = new LambdaQueryWrapper<>();
         wrapper.gt(Article::getId, dto.getLastId());
         wrapper.orderByDesc(Article::getId);
+
         Page<Article> page = new Page<>(dto.getPageNum(), dto.getPageSize());
+        page = mapper.selectPage(page, wrapper);
 
         ArticlePageVO vo = new ArticlePageVO();
         List<Article> records = page.getRecords();
+
         vo.setArticleList(records);
-        vo.setTotal(records.size());
-        vo.setLastIndex(records.get(records.size() - 1).getId());
+        vo.setTotal((int) page.getTotal());
         vo.setPageNum(dto.getPageNum());
+
+// 安全处理lastIndex
+        if (!records.isEmpty()) {
+            vo.setLastIndex(records.get(records.size() - 1).getId());
+        } else {
+            vo.setLastIndex(dto.getLastId());
+        }
+
         return R.success(vo);
     }
 

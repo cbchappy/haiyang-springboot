@@ -62,6 +62,13 @@
             <version>3.5.7</version>
         </dependency>
 
+        <!--阿里云审核-->
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>green20220302</artifactId>
+            <version>2.20.3</version>
+        </dependency>
+
         <!--模板引擎-->
         <dependency>
             <groupId>org.freemarker</groupId>

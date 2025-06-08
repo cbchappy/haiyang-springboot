@@ -63,6 +63,12 @@ public class BigModel {
 
         return queue;
     }
+    //id name address imgUrl description creat_time 基地表
+    //id user_id base_id content create_time 基地评论表
+    //id user_id base_id remind_time description create_time 实习日程安排  消息推送
+    //id user_id content imgUrl like_num create_time  实习帖子
+    //id user_id post_id content create_time 帖子评论表
+    //
 
     //移除对话历史
     public static void closeBigModel(Integer userId) {
